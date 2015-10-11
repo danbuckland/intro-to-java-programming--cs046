@@ -1,0 +1,5 @@
+#BlueJ class context
+comment0.params=width\ length
+comment0.target=int\ getNumberOfFields(int,\ int)
+comment0.text=\n\ Calculates\ the\ number\ of\ circular\ fields\ of\ Radius\ 400\ meters\n\ that\ can\ fit\ on\ a\ plot\n\ of\ land\ if\ the\ first\ row\ starts\ all\ the\ way\ at\ the\ left,\ and\n\ the\ second\ row\ starts\ one\ radius\ away\ from\ the\ left\ edge\ as\n\ described\ in\ the\ question\ video,\ and\ the\ circles\ are\ as\ close\n\ together\ as\ they\ can\ be\ without\ overlapping.\n
+numComments=1
