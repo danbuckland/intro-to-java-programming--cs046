@@ -1,10 +1,10 @@
-// Bluej project: finding_the_first_match
+// Bluej project: lesson6/position_of_first_match
 // Write a program that finds the first word in Alice In Wonderland
-// that is longer than a given number of characters.
+// that is longer than 9 characters, and if there are no words
+// that long, prints "There are no long words".
 
 import java.util.Scanner;
 import java.io.FileReader;
-import java.io.FileNotFoundException;
 
 public class FirstMatch
 {
@@ -12,20 +12,31 @@ public class FirstMatch
     {
         Scanner in = new Scanner(new FileReader("aliceInWonderland.txt"));
         String longWord = "";
-        String currentWord;
         boolean found = false;
+
         final int THRESHOLD = 9;
-        while (in.hasNext()) {
-            currentWord = in.next();
-            if (currentWord.length() > THRESHOLD) {
-                longWord = currentWord;
-                break;
-            }
+        int words = -1;
+
+        // TODO: Remember and print the position of the first word
+        // longer than THRESHOLD characters.
+        while (in.hasNext() && !found)
+        {
+            String word = in.next();
+            if (word.length() > THRESHOLD)
+            {
+                longWord = word;
+                found = true;
+            } 
+            ++words;
         }
-        // TODO: Write a loop that searches for long words
-        // (more than THRESHOLD letters)
-        // The loop should stop if you find one or if you run out of words
-        System.out.println("The first long word is: " + longWord);
+        if (found)
+        {
+            System.out.println("The first long word is " + longWord + " at position " + words);
+        }
+        else
+        {
+            System.out.println("There are no long words");
+        }
     }
 }
 
