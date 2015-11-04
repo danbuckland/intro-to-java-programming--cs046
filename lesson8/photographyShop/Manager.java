@@ -10,11 +10,17 @@ public class Manager
 {
     // YOUR CODE HERE
     // What does the manager need to remember to do his/her job?
+    private ArrayList<Photographer> photographers;
+    private ArrayList<Assignment> assignments;
+    private ArrayList<FinishedPhoto> finishedPhotos;
 
     public Manager()
     {
         // YOUR CODE HERE
         // How do you need to initialize the instance variables?
+        photographers = new ArrayList<Photographer>();
+        assignments = new ArrayList<Assignment>();
+        finishedPhotos = new ArrayList<FinishedPhoto>();
     }
 
     /**
@@ -24,8 +30,32 @@ public class Manager
     {
         // YOUR CODE HERE
         // How will you keep track of the photographers you have hired?
+        Photographer newPhotographer = new Photographer(photographer);
+        photographers.add(newPhotographer);
     }
 
+    /**
+     * Find highest unfinished assignment
+     */
+    private Assignment getHighestAssignment() {
+        int highestIndex = -1;
+        int highestPriority = -1;
+        
+        for (int index = 0; index < assignments.size(); ++index) {
+            int currentPriority = assignments.get(index).getPriority();
+            if (currentPriority > highestPriority) {
+                highestPriority = currentPriority;
+                highestIndex = index;
+            }
+        }
+        
+        if (highestIndex != -1) {
+            return assignments.remove(highestIndex);
+        } else {
+            return null;
+        }
+    }
+    
     /**
      * Called when it's time for the daily meeting where
      * the highest priority assignments are given to photographers.
@@ -40,6 +70,16 @@ public class Manager
         // Assign the highest priority assignment first to the
         // photographer who was hired first, then the next highest priority
         // assignment to the next photographer.
+        for (Photographer photographer : photographers) {
+            Assignment assignment = getHighestAssignment();
+            if (assignment != null) {
+                String description = assignment.getDescription();
+                String picture = photographer.takePicture(description);
+                String photographerName = photographer.getName();
+                FinishedPhoto finishedPhoto = new FinishedPhoto(description, picture, photographerName);
+                finishedPhotos.add(finishedPhoto);
+            }
+        }
     }
 
     /**
@@ -51,6 +91,8 @@ public class Manager
     {
         // YOUR CODE HERE
         // How will you keep track of the unfinished assignments?
+        Assignment newAssignment = new Assignment(priority, description);
+        assignments.add(newAssignment);
     }
 
     /**
@@ -64,5 +106,17 @@ public class Manager
         // this method is called, or you may have been displaying
         // the photos as you went. If you have already displayed
         // the photos, there is no need to do anything here.
+        int rightmostX = 0;
+        for (FinishedPhoto finishedPhoto : finishedPhotos) {
+            Picture picture = finishedPhoto.getPicture();
+            picture.translate(rightmostX, 0);
+            
+            String photographerName = finishedPhoto.getPhotographerName();
+            Text photographerText = new Text(rightmostX, picture.getHeight(), photographerName);
+
+            rightmostX = picture.getMaxX();
+            picture.draw();
+            photographerText.draw();
+        }
     }
 }

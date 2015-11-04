@@ -1,0 +1,19 @@
+#BlueJ class context
+comment0.params=
+comment0.target=Manager()
+comment1.params=photographer
+comment1.target=void\ hire(java.lang.String)
+comment1.text=\n\ Called\ when\ it's\ time\ to\ hire\ a\ new\ photographer.\n
+comment2.params=
+comment2.target=Assignment\ getHighestAssignment()
+comment2.text=\n\ Find\ highest\ unfinished\ assignment\n
+comment3.params=
+comment3.target=void\ giveOutAssignments()
+comment3.text=\n\ Called\ when\ it's\ time\ for\ the\ daily\ meeting\ where\n\ the\ highest\ priority\ assignments\ are\ given\ to\ photographers.\n\ Each\ photographer\ can\ take\ one\ assignment.\ The\ highest\ priority\n\ assignment\ should\ be\ given\ out\ first\ and\ the\ highest\ priority\n\ assignment\ should\ go\ to\ the\ photographer\ who\ was\ hired\ first.\n
+comment4.params=priority\ description
+comment4.target=void\ newAssignment(int,\ java.lang.String)
+comment4.text=\n\ A\ Customer\ came\ up\ with\ a\ new\ assignment.\ The\ manager\ should\n\ add\ it\ to\ the\ to-do\ list\ so\ that\ next\ time\ it's\ time\ to\ give\n\ out\ assignments,\ the\ new\ assignment\ will\ be\ a\ possibility.\n
+comment5.params=
+comment5.target=void\ checkPortfolio()
+comment5.text=\n\ It's\ the\ end\ of\ the\ story\ for\ now.\ Time\ to\ look\ at\ all\ the\n\ work\ the\ company\ has\ done.\n
+numComments=6

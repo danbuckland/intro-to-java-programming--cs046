@@ -18,21 +18,28 @@ import java.io.FileNotFoundException;
 public class Photographer
 {
     private Map<String, String> photos;
+    
+    private String name;
 
-    public Photographer()
+    public Photographer(String name)
     {
         photos = new HashMap(); // An important line. Must go in the constructor.
         readPhotos(); // A very important line. this must go in the Photographer
         // constructor so that the photographer will be able to take Pictures.
+        this.name = name;
     }
 
+    public String getName() {
+        return name;
+    }
+    
     /**
      * A helper method you will need to use.
      *
      * @param description the description of the desired photo.
      * @return the name of a file with a photo matching the description.
      */
-    private String takePicture(String description)
+    public String takePicture(String description)
     {
         return photos.get(description);
     }
