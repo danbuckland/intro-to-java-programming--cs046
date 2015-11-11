@@ -117,9 +117,34 @@ public class MyAgent extends Agent
      * 
      * @return the column that would allow a player to win.
      */
+    public int columnWithMaxNeighbors()
+    {
+        char[][] board = myGame.getBoardMatrix();
+
+        int bestRow = -1;
+        int bestColumn = -1;
+        int max = -1;
+        
+        for (int column = 0; column < myGame.getColumnCount(); column++) {
+            int row = getLowestEmptyIndex(myGame.getColumn(column));
+            if (row != -1) {
+                // TODO count neighbors
+                // TODO stay away form the borders...
+            }
+        }
+        
+        if (bestColumn != -1) return bestColumn;
+
+        return -1;
+    }
+    
+    /**
+     * Returns the column that would allow a player to win.
+     * 
+     * @return the column that would allow a player to win.
+     */
     public int check4Slots(char[][] board, int row, int column, int rowInc, int columnInc, boolean side) {
-        char myColor = side ? 'R' : 'Y';
-        char theirColor = side ? 'Y' : 'R';
+        char theColor = side ? 'R' : 'Y';
 
         int emptyRow = -1;
         int emptyColumn = -1;
@@ -127,15 +152,15 @@ public class MyAgent extends Agent
             int rowNow = row + i * rowInc;
             int columnNow = column + i * columnInc;
             char colorNow = board[rowNow][columnNow];
-            if (colorNow == theirColor) {
-                // opponent color in this row? can't win
-                return -1;
-            } else if (colorNow == 'B') {
-                // 2 blanks or more? no change of winning
+            if (colorNow == 'B') {
+                // 2 blanks or more? no change
                 if (emptyRow != -1) return -1;
                 emptyRow = rowNow;
                 emptyColumn = columnNow;
-            }
+            } else if (colorNow != theColor) {
+                // opponent color in this row? can't win
+                return -1;
+            } 
         }
         if (emptyRow == -1) return -1;
         if (getLowestEmptyIndex(myGame.getColumn(emptyColumn)) == emptyRow) {
