@@ -37,7 +37,21 @@ public class MyAgent extends Agent
      */
     public void move()
     {
+        int columnNumber;
 
+        // check if i can win
+        columnNumber = iCanWin();
+        if (columnNumber == -1) {
+            // i can not win, check if opponent is close to winning
+            columnNumber = theyCanWin();
+            if (columnNumber == -1) {
+                // TODO stay close to the opponent
+                // TODO find a position with the most Slots filled with tokens from your opponent
+                // they can not win either, let do some random move
+                columnNumber = randomMove();
+            }
+        }
+        moveOnColumn(columnNumber);
     }
 
     /**
@@ -99,6 +113,73 @@ public class MyAgent extends Agent
     }
 
     /**
+     * Returns the column that would allow a player to win.
+     * 
+     * @return the column that would allow a player to win.
+     */
+    public int check4Slots(char[][] board, int row, int column, int rowInc, int columnInc, boolean side) {
+        char myColor = side ? 'R' : 'Y';
+        char theirColor = side ? 'Y' : 'R';
+
+        int emptyRow = -1;
+        int emptyColumn = -1;
+        for (int i = 0; i < 4; ++i) {
+            int rowNow = row + i * rowInc;
+            int columnNow = column + i * columnInc;
+            char colorNow = board[rowNow][columnNow];
+            if (colorNow == theirColor) {
+                // opponent color in this row? can't win
+                return -1;
+            } else if (colorNow == 'B') {
+                // 2 blanks or more? no change of winning
+                if (emptyRow != -1) return -1;
+                emptyRow = rowNow;
+                emptyColumn = columnNow;
+            }
+        }
+        if (emptyRow == -1) return -1;
+        if (getLowestEmptyIndex(myGame.getColumn(emptyColumn)) == emptyRow) {
+            return emptyColumn;
+        }
+        return -1; 
+    }
+    
+    /**
+     * Returns the column that would allow a player to win.
+     * 
+     * @return the column that would allow a player to win.
+     */
+    public int columnToWin(boolean side)
+    {
+        char[][] board = myGame.getBoardMatrix();
+        int result = -1;
+        
+        for (int column = 0; column < myGame.getColumnCount(); column++) {
+            for (int row = 0; row < myGame.getRowCount(); row++) {
+                // top to bottom (column = constant)
+                if (row + 3 < myGame.getRowCount()) {
+                    result = check4Slots(board, row, column, 1, 0, side);
+                }
+                // left to right (row = constant)
+                if (column + 3 < myGame.getColumnCount()) {
+                    result = check4Slots(board, row, column, 0, 1, side);
+                }
+                // upperleft to lowerright
+                if (column + 3 < myGame.getColumnCount() && row + 3 < myGame.getRowCount()) {
+                    result = check4Slots(board, row, column, 1, 1, side);
+                }
+                // upperright to lowerleft
+                if (column > 2 && row + 3 < myGame.getRowCount()) {
+                    result = check4Slots(board, row, column, 1, -1, side);
+                }
+                if (result != -1) return result;
+            }
+        }
+
+        return -1;
+    }
+    
+    /**
      * Returns the column that would allow the agent to win.
      * 
      * You might want your agent to check to see if it has a winning move available to it so that
@@ -109,7 +190,7 @@ public class MyAgent extends Agent
      */
     public int iCanWin()
     {
-        return 0;
+        return columnToWin(iAmRed);
     }
 
     /**
@@ -123,7 +204,7 @@ public class MyAgent extends Agent
      */
     public int theyCanWin()
     {
-        return 0;
+        return columnToWin(!iAmRed);
     }
 
     /**
