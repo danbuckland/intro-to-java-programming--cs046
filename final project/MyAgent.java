@@ -127,9 +127,8 @@ public class MyAgent extends Agent {
      *
      * @return the column with the most neighbors
      */
-    public int clusterMove(boolean side) {
+    public int clusterMove(char color) {
         char[][] board = myGame.getBoardMatrix();
-        char myColor = side ? 'R' : 'Y';
 
         int bestColumn = -1;
         int max = -1;
@@ -142,7 +141,7 @@ public class MyAgent extends Agent {
                     for (int rowInc = -1; rowInc <= 1; ++rowInc) {
                         if (row + rowInc >= 0 && row + rowInc < myGame.getRowCount() && column + columnInc >= 0
                                 && column + columnInc < myGame.getColumnCount()
-                                && board[row + rowInc][column + columnInc] == myColor)
+                                && board[row + rowInc][column + columnInc] == color)
                             ++count;
                     }
                 }
@@ -153,18 +152,19 @@ public class MyAgent extends Agent {
             }
         }
 
-        if (max < 2 || max > 5)
-            return -1;
+        if (max >= 2 && max <= 5) {
+            return bestColumn;
+        }
 
-        return bestColumn;
+        return -1;
     }
 
     public int cluster() {
-        return clusterMove(iAmRed);
+        return clusterMove(iAmRed ? 'R' : 'Y');
     }
 
     public int decluster() {
-        return clusterMove(!iAmRed);
+        return clusterMove(iAmRed ? 'Y' : 'R');
     }
 
     /**
@@ -172,32 +172,29 @@ public class MyAgent extends Agent {
      *
      * @return the column that would allow a player to win.
      */
-    public int check4Slots(char[][] board, int row, int column, int rowInc, int columnInc, boolean side) {
-        char theColor = side ? 'R' : 'Y';
-
-        int emptyRow = -1;
+    public int check4Slots(char[][] board, int row, int column, int rowInc, int columnInc, char color) {
         int emptyColumn = -1;
         for (int i = 0; i < 4; ++i) {
             int rowNow = row + i * rowInc;
             int columnNow = column + i * columnInc;
             char colorNow = board[rowNow][columnNow];
             if (colorNow == 'B') {
-                // 2 blanks or more? no change
-                if (emptyRow != -1)
+                // 2 blanks? no change
+                if (emptyColumn != -1) {
                     return -1;
-                emptyRow = rowNow;
+                }
+                // is it a reachable blank?
+                if (getLowestEmptyIndex(myGame.getColumn(columnNow)) != rowNow) {
+                    return -1;
+                }
+                // this might be a good candidate!
                 emptyColumn = columnNow;
-            } else if (colorNow != theColor) {
+            } else if (colorNow != color) {
                 // opponent color in this row? can't win
                 return -1;
             }
         }
-        if (emptyRow == -1)
-            return -1;
-        if (getLowestEmptyIndex(myGame.getColumn(emptyColumn)) == emptyRow) {
-            return emptyColumn;
-        }
-        return -1;
+        return emptyColumn;
     }
 
     /**
@@ -205,30 +202,31 @@ public class MyAgent extends Agent {
      *
      * @return the column that would allow a player to win.
      */
-    public int columnToWin(boolean side) {
+    public int columnToWin(char color) {
         char[][] board = myGame.getBoardMatrix();
-        int result = -1;
+        int winningColumn = -1;
 
         for (int column = 0; column < myGame.getColumnCount(); column++) {
             for (int row = 0; row < myGame.getRowCount(); row++) {
                 // top to bottom (column = constant)
                 if (row + 3 < myGame.getRowCount()) {
-                    result = check4Slots(board, row, column, 1, 0, side);
+                    winningColumn = check4Slots(board, row, column, 1, 0, color);
                 }
                 // left to right (row = constant)
                 if (column + 3 < myGame.getColumnCount()) {
-                    result = check4Slots(board, row, column, 0, 1, side);
+                    winningColumn = check4Slots(board, row, column, 0, 1, color);
                 }
                 // upperleft to lowerright
                 if (column + 3 < myGame.getColumnCount() && row + 3 < myGame.getRowCount()) {
-                    result = check4Slots(board, row, column, 1, 1, side);
+                    winningColumn = check4Slots(board, row, column, 1, 1, color);
                 }
                 // upperright to lowerleft
                 if (column > 2 && row + 3 < myGame.getRowCount()) {
-                    result = check4Slots(board, row, column, 1, -1, side);
+                    winningColumn = check4Slots(board, row, column, 1, -1, color);
                 }
-                if (result != -1)
-                    return result;
+                if (winningColumn != -1) {
+                    return winningColumn;
+                }
             }
         }
 
@@ -245,7 +243,7 @@ public class MyAgent extends Agent {
      * @return the column that would allow the agent to win.
      */
     public int iCanWin() {
-        return columnToWin(iAmRed);
+        return columnToWin(iAmRed ? 'R' : 'Y');
     }
 
     /**
@@ -258,7 +256,7 @@ public class MyAgent extends Agent {
      * @return the column that would allow the opponent to win.
      */
     public int iWillLose() {
-        return columnToWin(!iAmRed);
+        return columnToWin(iAmRed ? 'Y' : 'R');
     }
 
     /**
