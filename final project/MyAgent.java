@@ -97,23 +97,10 @@ public class MyAgent extends Agent {
      * Returns a random valid move. If your agent doesn't know what to do, making a random move
      * can allow the game to go on anyway.
      * Prefer center...
-     * 0 1 2 3 4 5 6
+     *
      * @return a random valid move.
      */
     public int randomMove() {
-//        int center = myGame.getColumnCount() / 2;
-//        if (getLowestEmptyIndex(myGame.getColumn(center)) != -1)
-//            return center;
-//        if (getLowestEmptyIndex(myGame.getColumn(center + 1)) != -1)
-//            return center + 1;
-//        if (getLowestEmptyIndex(myGame.getColumn(center - 1)) != -1)
-//            return center - 1;
-//
-//        int i = r.nextInt(myGame.getColumnCount());
-//        while (getLowestEmptyIndex(myGame.getColumn(i)) == -1) {
-//            i = r.nextInt(myGame.getColumnCount());
-//        }
-
         int i = r.nextInt(myGame.getColumnCount() / 2) + myGame.getColumnCount() / 2 - 1;
         while (getLowestEmptyIndex(myGame.getColumn(i)) == -1) {
             i = r.nextInt(myGame.getColumnCount());
@@ -139,24 +126,24 @@ public class MyAgent extends Agent {
                 int count = 0;
                 for (int columnInc = -1; columnInc <= 1; ++columnInc) {
                     for (int rowInc = -1; rowInc <= 1; ++rowInc) {
-                        if (row + rowInc >= 0 && row + rowInc < myGame.getRowCount() && column + columnInc >= 0
+                        if (row + rowInc >= 0
+                                && row + rowInc < myGame.getRowCount()
+                                && column + columnInc >= 0
                                 && column + columnInc < myGame.getColumnCount()
-                                && board[row + rowInc][column + columnInc] == color)
+                                && board[row + rowInc][column + columnInc] == color) {
                             ++count;
+                        }
                     }
                 }
-                if (count > max) {
+                // only cluster when 2..5 same colors around
+                if (count >= 2 && count <= 5 && count > max) {
                     bestColumn = column;
                     max = count;
                 }
             }
         }
 
-        if (max >= 2 && max <= 5) {
-            return bestColumn;
-        }
-
-        return -1;
+        return bestColumn;
     }
 
     public int cluster() {
