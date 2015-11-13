@@ -37,16 +37,11 @@ public class MyAgent extends Agent {
         int columnNumber;
 
         // check if i can win
-        columnNumber = iCanWin();
-        if (columnNumber == -1) {
+        if ((columnNumber = iCanWin()) == -1) {
             // i can not win, check if opponent is close to winning
-            columnNumber = iWillLose();
-            if (columnNumber == -1) {
+            if ((columnNumber = iWillLose()) == -1) {
                 // they can not win either, lets try to create clusters of my own color
-                columnNumber = cluster();
-                // // they can not win either, lets try to interfere with clusters of my opponent
-                // columnNumber = decluster();
-                if (columnNumber == -1) {
+                if ((columnNumber = cluster()) == -1) {
                     // just get random
                     columnNumber = randomMove();
                 }
