@@ -12,7 +12,7 @@ public class Main {
         // create the red player, any subclass of Agent
         // Agent redPlayer = new RandomAgent(game, true);
         Agent redPlayer = new MyAgent(game, true);
-        // Agent yellowPlayer = new MyTestAgent(game, false);
+        // Agent redPlayer = new MyRecursiveAgent(game, true);
 
         // create the yellow player, any subclass of Agent
         // Agent yellowPlayer = new RandomAgent(game, false);
@@ -20,7 +20,9 @@ public class Main {
         // Agent yellowPlayer = new IntermediateAgent(game, false);
         // Agent yellowPlayer = new AdvancedAgent(game, false);
         Agent yellowPlayer = new BrilliantAgent(game, false);
-
+        // Agent yellowPlayer = new MyAgent(game, false);
+        // Agent yellowPlayer = new MyRecursiveAgent(game, false);
+        
         Connect4Frame mainframe = new Connect4Frame(game, redPlayer, yellowPlayer); // create the game window
     }
 }

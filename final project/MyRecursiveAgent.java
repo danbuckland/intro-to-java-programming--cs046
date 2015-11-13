@@ -1,16 +1,7 @@
-
-// MyAgent vs RandomAgent		10 vs 0
-// MyAgent vs BeginnerAgent		 9 vs 1
-// MyAgent vs IntermediateAgent		10 vs 0
-// MyAgent vs AdvancedAgent		 9 vs 1
-// MyAgent vs BrilliantAgent		 8 vs 2
-// MyAgent vs MyAgent			 5 vs 5
-// MyAgent vs MyRecursiveAgent		 7 vs 3
-
 import java.util.Random;
 
-public class MyAgent extends Agent {
-    Random r;
+public class MyRecursiveAgent extends Agent {
+    private Random r;
 
     /**
      * Constructs a new agent, giving it the game and telling it whether it is Red or Yellow.
@@ -18,7 +9,7 @@ public class MyAgent extends Agent {
      * @param game The game the agent will be playing.
      * @param iAmRed True if the agent is Red, False if the agent is Yellow.
      */
-    public MyAgent(Connect4Game game, boolean iAmRed) {
+    public MyRecursiveAgent(Connect4Game game, boolean iAmRed) {
         super(game, iAmRed);
         r = new Random();
     }
@@ -45,28 +36,13 @@ public class MyAgent extends Agent {
     public void move() {
         int columnNumber;
 
-        // iCanWin iWillLose prepareToWin preventToLose cluster random  wins / rounds
-        //    x        x          -             -          -       x      14 / 20
-        //    x        x          x             -          -       x      16 / 20
-        //    x        x          -             x          -       x      17 / 20
-        //    x        x          x             x          -       x      13 / 20
-        //    x        x          -             -          x       x      14 / 20
-        //    x        x          x             -          x       x      15 / 20
-        //    x        x          -             x          x       x      16 / 20
-        //    x        x          x             x          x       x      14 / 20
-
-        // other improvements:
-        //    i do not check if my new move will enable the opponent to win
-        //    it would really help a lot when i would check that
-        //    f.i. fill a structure columnsToAvoid
-        
         // check if i can win
         if ((columnNumber = iCanWin()) == -1) {
             // i can not win, check if opponent is close to winning
             if ((columnNumber = iWillLose()) == -1) {
-                // they can not win either, lets try to interfere my opponent a bit
-                if ((columnNumber = preventToLose()) == -1) {
-                    // all that is left is doing some random move
+                // they can not win either, lets look n steps ahead
+                if ((columnNumber = myBestRecursiveMove(3)) == -1) {
+                    // just get random
                     columnNumber = randomMove();
                 }
             }
@@ -120,61 +96,62 @@ public class MyAgent extends Agent {
     /**
      * Returns a random valid move. If your agent doesn't know what to do, making a random move
      * can allow the game to go on anyway.
-     * Prefer center for the first attempt...
+     * Prefer center...
      *
      * @return a random valid move.
      */
     public int randomMove() {
-        int column = r.nextInt(myGame.getColumnCount() / 2) + myGame.getColumnCount() / 2 - 1;
-        while (getLowestEmptyIndex(myGame.getColumn(column)) == -1) {
-            column = r.nextInt(myGame.getColumnCount());
+        int i = r.nextInt(myGame.getColumnCount() / 2) + myGame.getColumnCount() / 2 - 1;
+        while (getLowestEmptyIndex(myGame.getColumn(i)) == -1) {
+            i = r.nextInt(myGame.getColumnCount());
         }
 
-        return column;
+        return i;
     }
 
     /**
-     * Returns the column with the most neighbors
+     * Return the value of this move. Recursive
      *
      * @return the column with the most neighbors
      */
-    public int clusterMove(char color) {
-        char[][] board = myGame.getBoardMatrix();
+    public int tryMove(char[][] board, int depth, char color) {
+        if (depth <= 0) return 0;
 
+        int result = 0;
+        for (int column = 0; column < myGame.getColumnCount(); column++) {
+            int row = getLowestEmptyIndex(myGame.getColumn(column));
+            if (row == -1) continue;
+            board[row][column] = color;
+            
+            if (iWin(board) != -1) ++result;
+            if (iLose(board) != -1) --result;
+            result += tryMove(board, depth - 1, color);
+            board[row][column] = 'B';
+        }
+
+        return result;
+    }
+
+    public int myBestRecursiveMove(int depth) {
+        char[][] board = myGame.getBoardMatrix();
         int bestColumn = -1;
         int max = -1;
+        char color = iAmRed ? 'R' : 'Y';
+        int level = myGame.getColumnCount() ^ depth / 2;
 
         for (int column = 0; column < myGame.getColumnCount(); column++) {
             int row = getLowestEmptyIndex(myGame.getColumn(column));
-            if (row != -1) {
-                int count = 0;
-                for (int columnInc = -1; columnInc <= 1; ++columnInc) {
-                    for (int rowInc = -1; rowInc <= 1; ++rowInc) {
-                        int rowNow = row + rowInc;
-                        int columnNow = column + columnInc;
-                        if (rowNow >= 0 && rowNow < myGame.getRowCount() && columnNow >= 0 && columnNow < myGame.getColumnCount()
-                                && board[row + rowInc][column + columnInc] == color) {
-                            ++count;
-                        }
-                    }
-                }
-                // only cluster when 2..5 same colors around
-                if (count >= 2 && count <= 5 && count > max) {
-                    bestColumn = column;
-                    max = count;
-                }
+            if (row == -1) continue;
+            board[row][column] = color;
+            int result = tryMove(board, depth - 1, color);
+            board[row][column] = 'B';
+            if (result >= level && result > max) {
+                bestColumn = column;
+                max = result;
             }
         }
 
         return bestColumn;
-    }
-
-    public int cluster() {
-        return clusterMove(iAmRed ? 'R' : 'Y');
-    }
-
-    public int decluster() {
-        return clusterMove(iAmRed ? 'Y' : 'R');
     }
 
     /**
@@ -216,9 +193,8 @@ public class MyAgent extends Agent {
      *
      * @return the column that would allow a player to win.
      */
-    public int columnToWin(char color, int maxBlankPositions) {
-        char[][] board = myGame.getBoardMatrix();
-        int winningColumn = -1;
+    public int columnToWin(char[][] board, char color, int maxBlankPositions) {
+         int winningColumn = -1;
 
         for (int column = 0; column < myGame.getColumnCount(); column++) {
             for (int row = 0; row < myGame.getRowCount(); row++) {
@@ -246,13 +222,13 @@ public class MyAgent extends Agent {
      * @return the column that would allow the agent to win.
      */
     public int iCanWin() {
-        return columnToWin(iAmRed ? 'R' : 'Y', 1);
+        char[][] board = myGame.getBoardMatrix();
+        return columnToWin(board, iAmRed ? 'R' : 'Y', 1);
     }
 
-    public int prepareToWin() {
-        return columnToWin(iAmRed ? 'R' : 'Y', 2);
+    public int iWin(char[][] board) {
+        return columnToWin(board, iAmRed ? 'R' : 'Y', 0);
     }
-
 
     /**
      * Returns the column that would allow the opponent to win.
@@ -264,11 +240,12 @@ public class MyAgent extends Agent {
      * @return the column that would allow the opponent to win.
      */
     public int iWillLose() {
-        return columnToWin(iAmRed ? 'Y' : 'R', 1);
+        char[][] board = myGame.getBoardMatrix();
+        return columnToWin(board, iAmRed ? 'Y' : 'R', 1);
     }
 
-    public int preventToLose() {
-        return columnToWin(iAmRed ? 'Y' : 'R', 2);
+    public int iLose(char[][] board) {
+        return columnToWin(board, iAmRed ? 'Y' : 'R', 0);
     }
 
     /**
