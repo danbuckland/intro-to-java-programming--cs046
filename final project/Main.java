@@ -12,6 +12,7 @@ public class Main {
         // create the red player, any subclass of Agent
         // Agent redPlayer = new RandomAgent(game, true);
         Agent redPlayer = new MyAgent(game, true);
+        // Agent yellowPlayer = new MyTestAgent(game, false);
 
         // create the yellow player, any subclass of Agent
         // Agent yellowPlayer = new RandomAgent(game, false);

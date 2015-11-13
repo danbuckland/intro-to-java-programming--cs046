@@ -102,19 +102,24 @@ public class MyAgent extends Agent {
      * Returns a random valid move. If your agent doesn't know what to do, making a random move
      * can allow the game to go on anyway.
      * Prefer center...
-     *
+     * 0 1 2 3 4 5 6
      * @return a random valid move.
      */
     public int randomMove() {
-        int center = myGame.getColumnCount() / 2;
-        if (getLowestEmptyIndex(myGame.getColumn(center)) != -1)
-            return center;
-        if (getLowestEmptyIndex(myGame.getColumn(center + 1)) != -1)
-            return center + 1;
-        if (getLowestEmptyIndex(myGame.getColumn(center - 1)) != -1)
-            return center - 1;
+//        int center = myGame.getColumnCount() / 2;
+//        if (getLowestEmptyIndex(myGame.getColumn(center)) != -1)
+//            return center;
+//        if (getLowestEmptyIndex(myGame.getColumn(center + 1)) != -1)
+//            return center + 1;
+//        if (getLowestEmptyIndex(myGame.getColumn(center - 1)) != -1)
+//            return center - 1;
+//
+//        int i = r.nextInt(myGame.getColumnCount());
+//        while (getLowestEmptyIndex(myGame.getColumn(i)) == -1) {
+//            i = r.nextInt(myGame.getColumnCount());
+//        }
 
-        int i = r.nextInt(myGame.getColumnCount());
+        int i = r.nextInt(myGame.getColumnCount() / 2) + myGame.getColumnCount() / 2 - 1;
         while (getLowestEmptyIndex(myGame.getColumn(i)) == -1) {
             i = r.nextInt(myGame.getColumnCount());
         }
@@ -211,21 +216,30 @@ public class MyAgent extends Agent {
                 // top to bottom (column = constant)
                 if (row + 3 < myGame.getRowCount()) {
                     winningColumn = check4Slots(board, row, column, 1, 0, color);
+                    if (winningColumn != -1) {
+                        return winningColumn;
+                    }
                 }
                 // left to right (row = constant)
                 if (column + 3 < myGame.getColumnCount()) {
                     winningColumn = check4Slots(board, row, column, 0, 1, color);
+                    if (winningColumn != -1) {
+                        return winningColumn;
+                    }
                 }
                 // upperleft to lowerright
                 if (column + 3 < myGame.getColumnCount() && row + 3 < myGame.getRowCount()) {
                     winningColumn = check4Slots(board, row, column, 1, 1, color);
+                    if (winningColumn != -1) {
+                        return winningColumn;
+                    }
                 }
                 // upperright to lowerleft
                 if (column > 2 && row + 3 < myGame.getRowCount()) {
                     winningColumn = check4Slots(board, row, column, 1, -1, color);
-                }
-                if (winningColumn != -1) {
-                    return winningColumn;
+                    if (winningColumn != -1) {
+                        return winningColumn;
+                    }
                 }
             }
         }
