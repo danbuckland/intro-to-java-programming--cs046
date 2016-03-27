@@ -1,3 +1,3 @@
 # cs046
 
-For the 'Intro to Java Programming course'
+For the 'Intro to Java Programming' course
